@@ -109,7 +109,52 @@ class ChangeTextTest {
         val result = device.findObject(By.res(packageName, "textToBeChanged")).text
         assertEquals(result, textToSet)
     }
+    @Test
+    fun testEmptyStringDoesNotChangeText() {
+        // Находим элемент TextView, в котором отображается текст, и запоминаем, что там было изначально
+        val textToBeChanged = device.findObject(By.res(packageName, "textToBeChanged"))
+        val originalText = textToBeChanged.text
 
+        // Находим поле ввода
+        val userInput = device.findObject(By.res(packageName, "userInput"))
+        // Кликаем по нему (ЛКМ)
+        userInput.click()
+        // Очищаем, если там что-то было, и вводим пробелы (что считается пустой строкой)
+        userInput.clearTextField()
+        userInput.text = "      " // несколько пробелов
+
+        // Находим кнопку изменения текста и кликаем по ней
+        val buttonChange = device.findObject(By.res(packageName, "buttonChange"))
+        buttonChange.click()
+
+        // Проверяем, что текст в TextView остался равен originalText
+        assertEquals(originalText, textToBeChanged.text)
+    }
+    @Test
+    fun testOpenTextInNewActivity() {
+        // Задаем текст, который будем вводить
+        val textToType = "Netology Test"
+
+        // Находим поле ввода, кликаем, очищаем и вводим наш текст
+        val userInput = device.findObject(By.res(packageName, "userInput"))
+        userInput.click()
+        userInput.clearTextField()
+        userInput.text = textToType
+
+        // Находим кнопку запуска новой Activity и кликаем по ней
+        val buttonActivity = device.findObject(By.res(packageName, "buttonActivity"))
+        buttonActivity.click()
+
+        // Ждем, пока на экране появится новая Activity (допустим, ждем появления элемента с ID "text")
+        // timeout 5000 миллисекунд (5 секунд)
+        device.wait(Until.hasObject(By.res(packageName, "text")), 5000)
+
+        // Находим текстовое поле в новой Activity
+        val textInNewActivity = device.findObject(By.res(packageName, "text"))
+
+        // Проверяем, что текст в новой Activity совпадает с тем, что мы ввели
+        assertEquals(textToType, textInNewActivity.text)
+    }
 }
 
 
